@@ -46,7 +46,7 @@ Radius base 12px. Cards are `rounded-2xl` and dashboard panels `rounded-3xl`, wi
 
 ## Type
 
-Inter, with Geist Mono for record references.
+IBM Plex Sans, with Geist Mono for record references.
 
 | Role | Size |
 |---|---|

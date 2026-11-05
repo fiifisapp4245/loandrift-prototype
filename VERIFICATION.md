@@ -1,5 +1,7 @@
 # LoanDrift prototype: final verification (Prompt 8)
 
+> **Newer:** the 5 November release-readiness report is [RELEASE-READINESS.md](RELEASE-READINESS.md), with the four-width sweep and a Pass/Fail/Blocked matrix. This file keeps the per-finding detail.
+
 Verified 3 November 2026. Scope: the redesign as built in this prototype (Prompts 1–7, plus the dashboard changes requested along the way).
 
 > **Read this first.**
@@ -22,10 +24,10 @@ Open <http://localhost:3217>; it redirects to `/dashboard`. The product page is 
 
 | Check | Result |
 |---|---|
-| `npm test` (Vitest) | **278 passed**, 30 files |
+| `npm test` (Vitest) | **326 passed**, 34 files |
 | `npm run typecheck` | Pass |
 | `npm run lint` | Pass, no warnings |
-| `next build` | Pass |
+| `next build` | Pass (re-run 5 November, 30 pages) |
 | axe-core 4.14, in the browser | **0 violations** on every route and state below, after the fixes in this step |
 
 **Routes and states scanned with axe** (1440 px unless noted):
@@ -40,7 +42,9 @@ Open <http://localhost:3217>; it redirects to `/dashboard`. The product page is 
 - **Clients:** the list, a client profile, and the Add client form with errors showing
 - **UI foundations**
 - **Public pages:** the product page (draft and release views) and Book a demo
-- **Placeholder routes:** `/collateral`, `/expenses`
+- **Placeholder routes:** `/expenses`
+- **Groups:** the list (1440 and 375 px), a group page with Add member open and its errors showing, the removal dialog, the group loan application with errors (1440 and 375 px), and Form a group with errors
+- **Collateral:** the register (1440 and 375 px), the asset drawer, the lien form with errors, Register an asset with errors, and the loan record's Collateral tab
 - **Collections:** the list, the follow-up drawer, the contact form with errors, and the empty 31–60 band (375 px)
 - **Loan application:** Loan details, Penalty, Guarantors and Review with errors
 - **Credit Score:** All assessments, and the incomplete assessment's drawer
@@ -92,7 +96,7 @@ During scanning, the hidden Browser pane delayed Next.js's streaming swap, so pa
 | F03 | Collected amounts (GH₵940 vs GH₵800) | **Needs business validation** | Dashboard | Two defined measures (Repayments received; Collection rate). The real cause can't be traced without the backend |
 | F04, F05 | Personal vs branch work; alerts vs tasks | Resolved | Dashboard *Needs attention*; My Approvals; Notifications | Scope tests; the unread badge changes while the task stays open |
 | F06 | Collection-rate and financial definitions | Partial | Dashboard ring; FINANCIAL-CONTRACT.md | No denominator means Unavailable (tested). The due-today cut-off is an assumed rule |
-| F07 | Priority set with F01–F06 (exact text unknown) | Needs audit text | — | — |
+| F07 | Date inputs and applied range disagree (the handoff ties it to F55 and F73) | **Resolved** | Dashboard and Repayments | Shared picker fixed in R1; see F73 |
 | F08, F09 | Shell and navigation (Prompt 1) | Resolved, if the mapping is right | `components/shell/*` | Shell tests; axe; phone drawer and collapsed sidebar checks |
 | F10, F11 | Dashboard (Prompt 2 range F03–F11) | Partial, wording unknown | Dashboard | See Prompt 2 in CHANGES.md |
 | F12 | Raw amounts and status formatting | Resolved | `lib/format.ts`, status badges | Formatting tests; Activities "no raw values" test |
@@ -128,10 +132,15 @@ During scanning, the hidden Browser pane delayed Next.js's streaming swap, so pa
 | F57 | Receipt preview | **Resolved** (mock) | A drawer with loading, the receipt, or an error with Retry and a fallback route. Print and download are disabled. The live cause still needs checking in a normal browser |
 | F58 | Aging-filter empty heading | **Resolved** | "No accounts 31–60 days overdue" with Reset; Branch totals labelled as unaffected by filters. Tests |
 | F59 | Contact logging classifications and time | **Resolved** (mock) | Channel, outcome and promise defined separately; outcomes limited per channel; every promise path needs an amount and date; *Says they've already paid* records no payment; labelled contact time in GMT. Saving is in memory only. Tests |
-| F60 | Collateral currency and valuation basis | Partial | Loan record Collateral tab shows currency, basis and lien. Register not built |
-| F61–F63 | Collateral exceptions, actions, forms | Not in this increment | — |
-| F64–F67 | Groups | Not in this increment | — |
-| F68 | Loading or filtered metrics look like facts | **Resolved** on built screens | Skeletons, never zeros; result counts hidden while loading; labelled scopes. Tests |
+| F60 | Collateral currency and valuation basis | **Resolved** | `/collateral`: currency on every amount; value used labelled with its basis and date; forced sale *Not recorded*, never zero; coverage totalled per basis and currency. Tests |
+| F61 | Missing-lien exception hard to work | **Resolved** | Separate counts for verification, missing lien and estimate-only, each linking to just those assets. The lien rule is flagged as policy to confirm |
+| F62 | Remove from loan on a written-off loan | **Resolved** (UI) | Removal only before disbursement, with the reason otherwise; recovery and release are separate. All disabled in the prototype; server permission isn't modelled |
+| F63 | Collateral form labels and defaults | **Resolved** (mock) | No preselected basis, lien status or registry; independent valuations need a report; type-specific and third-party fields; upload limits stated. Tests and axe |
+| F64 | Membership changes need a commitment model | **Resolved** (mock) | Search, then select one client, then choose a role (none preselected), then a review line, then an explicit *Add member*. Role changes and removals are dialogs with their own check; removal lists what the member still owes. Clients in another active group can't be selected, with the reason. Success and failure both say nothing was changed. Whether an outstanding loan blocks removal **needs policy**. Tests |
+| F65 | "Apply for 0 members" | **Resolved** (mock) | Nobody is included by default. *Apply* is disabled at zero with the reason, and counts only members with a valid amount; partly filled rows are named. Errors name the member. Members missing an ID or phone can't be included, the same rule as an individual application. Tests |
+| F66 | Joint liability preselected without an obligation summary | Partial | No liability preselected; each option explained without contract wording. Review shows each member's principal and the total in the product's currency, with the terms. Interest, fees, schedule and total to repay are *Unavailable*, from the same calculation state as an individual application: there's no verified calculation service. **Liability policy needs the business** |
+| F67 | Group page omits meeting details | **Resolved** | Overview with code, status, formed date, meeting day, frequency and place, and notes; *Not recorded* where missing. Viewing is separate from the disabled *Edit details*. Form a group captures the same fields. Tests |
+| F68 | Loading or filtered metrics look like facts | **Resolved** | Skeletons, never zeros; result counts hidden while loading; labelled scopes. Groups keeps branch totals during search and counts "matching groups" separately. Tests |
 
 ### F69–F75 (3 November consolidated handoff)
 
@@ -159,9 +168,10 @@ During scanning, the hidden Browser pane delayed Next.js's streaming swap, so pa
 
 - **Financial rules:** allocation order, over-payments, fees and penalties, early settlement, the due-today cut-off, backdating effects, which balance is authoritative, legacy scores, and the interest basis (FINANCIAL-CONTRACT.md).
 - **Signing rule:** whether a loan can be disbursed with a signature outstanding (DEMO-LN-009).
+- **Groups:** which liability options a product allows, whether a member with an outstanding loan can leave, whether an inactive group can borrow, and the real role list.
 - **Commercial:** prices, billing currency and basis, plan limits, which plan includes online repayments, collections, collateral and groups, approved proof, integrations, and the reply time after a demo request.
 - **Platform:** the real TroveSuite site navigation, the LoanDrift logo, and the paths for the Money and System sections.
 
 ## What to build next
 
-The Phase 2 placeholders: Collateral (B2-07) and Groups (B2-08). R4–R6 wait for the live modules to be inspected. See `docs/NEXT-PROMPTS.md`.
+R7, the final release-readiness report. R4–R6 wait for the live modules to be inspected. See `docs/NEXT-PROMPTS.md`.

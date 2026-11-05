@@ -107,11 +107,38 @@ export function clientNotes(c: DemoClient): string[] {
   return hasActiveLoan(c.id) ? ["Already has an active loan. Whether a second loan is allowed is for the approver; this form doesn't decide it."] : []
 }
 
+/** The terms every loan shares, individual or group. Group loans reuse this, not a copy (B2-08). */
+export type SharedTerms = Pick<ApplicationDraft, "product" | "rate" | "interestPeriod" | "basis" | "frequency" | "installments" | "firstRepaymentOn">
+
+/** Checks one principal. Group loans run it once per included member. */
+export function principalError(value: string): string | undefined {
+  if (!amount(value)) return "Enter the principal to register."
+  if (!AMOUNT.test(amount(value)) || Number(amount(value)) <= 0) return "Enter an amount above zero, for example 1200 or 1200.50."
+}
+
+/** True when the rate's period and the repayment frequency are different units (week vs month). */
+export function unitsDiffer(period: string, frequency: string) {
+  return !((period === "Week" && frequency === "Weekly") || (period === "Month" && frequency === "Monthly"))
+}
+
+/** How long repayment runs: installments × frequency, said in its own unit. */
+export function durationText(installments: string, frequency: string): string | null {
+  const n = Number(installments)
+  if (!/^\d+$/.test(installments.trim()) || n < 1 || !frequency) return null
+  const unit = frequency === "Weekly" ? "week" : "month"
+  return `${n} ${n === 1 ? unit : `${unit}s`}`
+}
+
 export function validateTerms(d: ApplicationDraft, today = DEMO_TODAY): AppErrors {
+  // Same order as the form: product, then principal, then the rest.
+  const { product, ...rest } = validateSharedTerms(d, today)
+  const principal = principalError(d.principal)
+  return { ...(product && { product }), ...(principal && { principal }), ...rest }
+}
+
+export function validateSharedTerms(d: SharedTerms, today = DEMO_TODAY): AppErrors {
   const e: AppErrors = {}
   if (!d.product) e.product = "Choose the loan product."
-  if (!amount(d.principal)) e.principal = "Enter the principal to register."
-  else if (!AMOUNT.test(amount(d.principal)) || Number(amount(d.principal)) <= 0) e.principal = "Enter an amount above zero, for example 1200 or 1200.50."
   if (!d.rate.trim()) e.rate = "Enter the interest rate from the product sheet."
   else if (!/^\d+(\.\d{1,3})?$/.test(d.rate.trim()) || Number(d.rate) > 100) e.rate = "Enter a percentage between 0 and 100, for example 5 or 4.5."
   if (!d.interestPeriod) e.interestPeriod = "Choose the period the rate applies to."

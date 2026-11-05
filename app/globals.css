@@ -8,9 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-canvas: var(--canvas);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-ref), ui-monospace, monospace;
-  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
   --color-brand-subtle: var(--brand-subtle);

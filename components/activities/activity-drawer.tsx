@@ -104,7 +104,7 @@ export function ActivityDrawer({ id, eventHref, onClose }: { id: string; eventHr
               ) : e.changes.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Saved with no field changes.</p>
               ) : (
-                <div className="overflow-x-auto rounded-xl border">
+                <div tabIndex={0} role="region" aria-label="Field changes, scrolls sideways" className="overflow-x-auto rounded-xl border">
                   <table className="w-full text-left text-sm">
                     <caption className="sr-only">Field changes</caption>
                     <thead className="bg-muted/60 text-xs text-muted-foreground">

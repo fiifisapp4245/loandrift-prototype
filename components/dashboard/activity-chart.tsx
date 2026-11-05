@@ -141,7 +141,7 @@ export function ActivityChart({ activity, bare }: { activity: PeriodActivity; /*
 
       <details className="text-sm">
         <summary className="w-fit cursor-pointer text-xs font-medium text-primary">Show as a table</summary>
-        <div className="mt-2 overflow-x-auto">
+        <div tabIndex={0} role="region" aria-label="Cash movement table, scrolls sideways" className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-xs">
             <caption className="sr-only">Cedi cash movement by {BUCKET_NOUN[activity.bucketSize]}</caption>
             <thead className="text-muted-foreground">

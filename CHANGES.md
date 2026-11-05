@@ -4,6 +4,93 @@ Newest increment first.
 
 ---
 
+# Release-readiness pass (R7)
+
+5 November 2026. Report: [RELEASE-READINESS.md](RELEASE-READINESS.md): prototype vs live scope, checks, a Pass/Fail/Blocked matrix for F01–F75, and the remaining policy and source questions. No new screens.
+
+A sweep of 35 routes and states at 390, 768, 1024 and 1440 px found two real defects the earlier scans missed, now fixed:
+- **`/loans/new` scrolled sideways at every width.** The section nav's visually hidden text sat outside its scroller. The list is now the containing block.
+- **Table scrollers couldn't be reached by keyboard** (axe `scrollable-region-focusable`): loan and repayment schedules, receipts, record-payment allocation, activity field changes, the dashboard's table view and the plan comparison. Each is now a labelled, focusable region.
+
+Also: F07 is now matched to the date-range fix (the handoff ties it to F55 and F73), so it's no longer "needs audit text".
+
+**Checks:** 326 tests (1 new), typecheck, lint and `next build` pass; after the fixes, 36 page-and-width checks show 0 overflow and 0 axe violations. Error states show Retry on every screen that loads asynchronously. Not done: a screen-reader pass.
+
+---
+
+# Groups and group lending (B2-08)
+
+5 November 2026. Routes: `/groups`, `/groups/[id]`, `/groups/[id]/apply` and `/groups/new`. Data: `lib/group-fixtures.ts` (three fictional groups, one group loan) and `lib/api/groups.ts`.
+
+| Requirement | Implementation |
+|---|---|
+| Honest totals while loading and searching (F68) | *Branch totals* (active groups, members in active groups, group loans awaiting approval) show placeholders while loading, never zeros, and don't change with the search. The list has its own "N matching groups of 3" count. A search with no match keeps *No group matches* and adds "Try another name or code" with Clear search |
+| Meeting details visible without editing (F67) | Each group page opens with an Overview: code, status, formed date, meeting day, frequency and place, and notes. Missing fields read *Not recorded*. *Edit details* is separate (and disabled here). *Form a group* captures exactly these fields; name, code (unique) and formed date are required, meeting details are optional |
+| Membership changes are deliberate (F64) | *Add member*: search (2+ characters, current members not listed), select one client, choose a role (none preselected), see "Ready to add Kwame Mock as treasurer", then press *Add member*. Searching and selecting never add anyone. *Change role* and *Remove* open dialogs with their own check; the current role is never preselected, and the same role is refused. Every outcome says "Nothing was changed"; a failed check says so with "try again" (`?demo=member-error`). Focus returns to the button that opened the dialog |
+| Existing restrictions kept, none invented | A client already in another active group is listed but can't be selected, with the group named (the one-active-group rule observed live). Removal shows what the member still owes, and says whether that blocks leaving is policy, not decided here |
+| No zero-member application (F65) | Nobody is included by default. *Apply* is disabled with "Include at least one member with an amount to apply", and otherwise reads "Apply for N members", counting only members with a valid amount; "1 of 2 included members still needs a valid amount" covers the gap. Errors name the member. A member with no phone or ID on file can't be included, the same evidence an individual application needs |
+| Terms labelled and reused, not reimplemented | Interest charge period, repayment frequency, installment count and the derived duration ("6 months") are separate labelled fields, with the rate-vs-frequency mismatch warning. Validation is the individual application's own `validateSharedTerms` and `principalError` (split out of `validateTerms`, behaviour unchanged) |
+| Liability and obligations (F66) | No liability is preselected. Joint and individual are explained in plain words, with the exact obligation left to the agreement template. Review shows each included member's principal and the total in the product's currency (no currency is assumed before a product is chosen), plus liability and terms. Interest, fees, schedule and total to repay show the same *Calculation incomplete* or *Unavailable* state as an individual application: there's still no verified calculation service, so no group formula exists |
+| Nothing recorded | Membership changes, new groups and applications are checked only. Each application note says it would go to Approvals for a different user |
+
+**Fixtures exercised:**
+- Osu Market Traders: four members, full meeting details, a joint-liability group loan awaiting approval (three members, GH₵1,900 total)
+- Labadi Food Sellers: meeting place and notes not recorded, no group loans, a member with a defaulted loan (DEMO-LN-002) and a member with no phone on file
+- Ridge Caterers: inactive, no meeting day; its members can join an active group
+
+**Assumptions to check against the live app:** the role names (the live selector's options weren't recorded), and whether an inactive group can borrow (the form notes it for the approver instead of deciding).
+
+**Also fixed:** the Book a demo test raced the error summary's focus and could type into the wrong field. It now waits for focus first, the same fix as the Collections test.
+
+**Phase 2 status (F41–F68):** every finding is now Resolved or Partial; none is still unbuilt. The full matrix is in VERIFICATION.md. Open dependencies:
+- **Policy:** liability options per product (F66), leaving a group with an outstanding loan (F64), redecision and reopening rules (F46), which assets need a lien (F61)
+- **Calculation:** no verified interest, fee or schedule service (F47, F66); every total to repay stays Unavailable until there is one
+- **Permissions:** server-side checks and audit for member, collateral and approval actions aren't modelled
+- **Live evidence:** the receipt preview cause (F57) and the role list
+
+**Checks:**
+- `npm test`: **325 pass** (32 new)
+- Typecheck and lint pass
+- axe: 0 violations on the groups list (1440 and 375 px), a group page with Add member and its errors, the removal dialog, the group loan application with errors (1440 and 375 px), and Form a group with errors
+- No page-level horizontal scroll at 375 px
+
+---
+
+# Collateral register (B2-07)
+
+3 November 2026. Routes: `/collateral` and `/collateral/new`. Data: `lib/collateral-fixtures.ts` (six fictional assets) and `lib/api/collateral.ts`. The loan record's Collateral tab now reads this register, so there's one source; the old per-loan collateral list in `lending-fixtures.ts` was removed.
+
+| Requirement | Implementation |
+|---|---|
+| Currency and value basis everywhere (F60) | Every amount shows its currency. Each asset has a **value used**, labelled with its basis and date: the *Registration estimate* until a valuation exists, then the latest *Independent* or *Internal valuation*, which replaces it. **Forced sale** reads *Not recorded* when the valuer gave none, never zero |
+| Coverage that doesn't mix bases | *Pledged value, by basis*: recorded valuations, estimates only and forced-sale values, each totalled per currency with "2 of 4" counts. Estimates are never added to valuations, and cedis are never added to dollars |
+| Exceptions as workable queues (F61) | *Needs attention* lists three labelled counts: Awaiting verification (1), Pledged with no lien recorded (2), Estimate only (3). Each links to a filter showing just those assets, and the same filter is in the toolbar. The register also has Lien and Forced-sale columns |
+| No legal assumptions | "No lien recorded" counts only pledged assets on disbursed loans, and it's labelled as **policy to confirm**: which asset types need a lien isn't decided here. Registry names are fixture data |
+| Actions match the lifecycle (F62) | *Remove from loan* is offered only before disbursement. On the written-off DEMO-LN-006 it reads "Not possible: the loan is written off, so it has already been disbursed". *Start recovery* applies to defaulted or written-off loans, and *Release to owner* only after full repayment. These are three separate operations. Even when the state allows one, it's disabled here: "the server still checks permission" |
+| Safer form defaults (F63) | **Record a valuation**: no basis is preselected. *Independent* requires the valuer and a report; *Internal* is recorded as internal, never as independent. Forced-sale value is optional and stays *Not recorded* if blank. **Record a lien**: no status or registry is preselected. *Registered* needs a registry, reference, date and the registry's confirmation; *Not registered yet* is a valid choice |
+| Labels, help, errors | A shared `FormField` and `RadioChoice` give every control a visible label, (required) or (optional), associated help and errors. Choices with no safe default are radio groups with nothing selected |
+| Type-specific registration and third parties | *Register an asset* shows registration number and make for vehicles, location and title reference for property, and a serial number for equipment or household goods. *Someone else* as owner asks for their name, phone and relationship, and says their signed consent is tracked with the loan's signatures; the wording comes from the agreement template. Uploads say JPG, PNG or PDF up to 5 MB. Only loans not yet disbursed are listed |
+| Nothing recorded | Every form only checks ("Nothing was saved"). Cancel returns focus to the button that opened the form, and the registration form asks before discarding |
+
+**Fixtures exercised:**
+- Estimate only (COL-01 vehicle, COL-06 in USD)
+- Internal valuation with no forced-sale value (COL-04)
+- Independent valuation with a forced-sale value and a third-party owner, on a written-off loan (COL-03)
+- Awaiting verification on an undisbursed loan (COL-02)
+- Released after repayment (COL-05)
+
+**Also fixed:**
+- A test-only flake: the Book a demo form test waited for an 800 ms mocked send with the 1 s default timeout. It now allows 3 s.
+- A fixture slip while removing the duplicate collateral list: DEMO-LN-011's empty documents list, restored.
+
+**Checks:**
+- `npm test`: **293 pass** (15 new)
+- Typecheck and lint pass
+- axe: 0 violations on the register, the asset drawer, the lien form with errors, the registration form with errors, the loan record's Collateral tab, and the register at 375 px
+- No page-level horizontal scroll at 375 px
+
+---
+
 # Collections (B2-06)
 
 3 November 2026. Route: `/collections`. Data: `lib/api/collections.ts`. Arrears come from the shared financial contract (`loanPosition`), so they match the dashboard and each loan record.
@@ -700,7 +787,7 @@ These aren't a full accessibility audit. No axe or screen-reader pass has been r
 
 ## Assumptions to check
 
-1. **Brand.** Colours and type come from the TroveSuite core platform prototype (blue `#2563EB`, navy `#0B4C8C`, Inter). The real LoanDrift colours and fonts weren't available. The logo is a placeholder.
+1. **Brand.** Colours and type come from the TroveSuite core platform prototype (blue `#2563EB`, navy `#0B4C8C`; the typeface has since changed to IBM Plex Sans). The real LoanDrift colours and fonts weren't available. The logo is a placeholder.
 2. **Navigation.** The Lending items and the nine Loan Features paths match the Phase 2 audit. The children of Money and System (Savings, Investments, Accounting, Reports, Settings, Bulk Upload) and all their paths are guesses from mentions in the audits.
 3. **Light only.** The brief asks for a light interface, so there's no dark mode.
 4. **Branch time** is Africa/Accra (GMT, no daylight saving).

@@ -86,8 +86,11 @@ describe("Book a demo form", () => {
     mockSearch.current = new URLSearchParams("product=loandrift&intent=demo")
     render(<ContactForm />)
     await userEvent.click(screen.getByRole("button", { name: "Request a demo" }))
-    expect((await screen.findByRole("alert")).textContent).toContain("Enter your work email so we can reply.")
+    const summary = await screen.findByRole("alert")
+    expect(summary.textContent).toContain("Enter your work email so we can reply.")
     expect(screen.getByLabelText(/Work email/).getAttribute("aria-invalid")).toBe("true")
+    // The summary takes focus on the next frame; type only after that, or keystrokes race it.
+    await waitFor(() => expect(document.activeElement).toBe(summary))
 
     await userEvent.type(screen.getByLabelText(/Your name/), "Test Person")
     await userEvent.type(screen.getByLabelText(/Work email/), "test@example.com")

@@ -3,9 +3,10 @@ import { allDestinations } from "@/lib/nav"
 import { plannedIncrement } from "@/lib/roadmap"
 
 describe("placeholder scope labels (F75)", () => {
-  it("no longer lists Credit Score and Calendar as placeholders, now that R3 built them", () => {
+  it("no longer lists Credit Score, Calendar or Groups as placeholders, now that they're built", () => {
     expect(plannedIncrement("/credit-score")).toBeNull()
     expect(plannedIncrement("/calendar")).toBeNull()
+    expect(plannedIncrement("/groups")).toBeNull()
   })
 
   it("marks the uninspected modules as blocked rather than planned as if ready", () => {

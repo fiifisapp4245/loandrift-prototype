@@ -153,7 +153,7 @@ export function RecordPayment({
 
         <div>
           <h3 className="mb-2 text-sm font-semibold">How it would be allocated</h3>
-          <div className="overflow-x-auto rounded-2xl border">
+          <div tabIndex={0} role="region" aria-label="Allocation to installments, scrolls sideways" className="overflow-x-auto rounded-2xl border">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Allocation of {formatMoney(preview.amount)} to installments</caption>
               <thead className="bg-muted/60 text-xs text-muted-foreground">

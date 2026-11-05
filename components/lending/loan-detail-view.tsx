@@ -206,7 +206,7 @@ export function LoanDetailView({ reference }: { reference: string }) {
             {schedule.length === 0 ? (
               <StateMessage state="empty" title="No schedule yet" description={isUnavailable(financials.totalPayable) ? financials.totalPayable.reason : undefined} />
             ) : (
-              <div className="overflow-x-auto rounded-2xl border">
+              <div tabIndex={0} role="region" aria-label={`Repayment schedule for ${loan.reference}, scrolls sideways`} className="overflow-x-auto rounded-2xl border">
                 <table className="w-full text-left text-sm">
                   <caption className="sr-only">Repayment schedule for {loan.reference}</caption>
                   <thead className="bg-muted/60 text-xs text-muted-foreground">

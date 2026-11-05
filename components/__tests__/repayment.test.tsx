@@ -36,6 +36,13 @@ describe("Repayment overview", () => {
     expect(fact("Settlement amount")).toContain("Unavailable")
   })
 
+  it("makes the schedule and receipts scrollers keyboard-reachable regions (R7)", () => {
+    view("DEMO-LN-001")
+    for (const name of ["Repayment schedule for DEMO-LN-001, scrolls sideways", "Receipts for DEMO-LN-001, scrolls sideways"]) {
+      expect(screen.getByRole("region", { name }).getAttribute("tabindex")).toBe("0")
+    }
+  })
+
   it("labels the receipt balance as historical", () => {
     view("DEMO-LN-009")
     expect(screen.getByRole("columnheader", { name: /Balance after \(at the time\)/ })).toBeTruthy()

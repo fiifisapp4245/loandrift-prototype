@@ -20,7 +20,8 @@ Source: `LoanDrift_Consolidated_Audit_and_Claude_Handoff_2026-11-03.md`, which a
 | Transactions | `/transactions` | Built | B2-04 |
 | Repayments index | `/repayments` | Built | B2-05: received today, payment history, receipt preview |
 | Collections | `/collections` | Built | B2-06: arrears worklist, contact log, promises worked out from receipts |
-| Collateral, Groups | `/collateral`, `/groups` | Placeholder | B2-07, B2-08 |
+| Collateral | `/collateral`, `/collateral/new` | Built | B2-07: register, exceptions, lifecycle actions, mocked forms |
+| Groups | `/groups`, `/groups/[id]`, `/groups/[id]/apply`, `/groups/new` | Built | B2-08: overview, reviewed member changes, group loan application, Form a group |
 | Credit Score, Calendar | `/credit-score`, `/calendar` | Built | R3, from fictional assessments and the canonical schedule |
 | Savings | `/savings` | Placeholder | Only the live listing has been observed (F72). R4 is **blocked** on source inspection |
 | Investments, Accounting, Reports, Bulk Upload | `/investments`, `/accounting`, `/reports`, `/bulk-upload` | Placeholder | R4–R6 **blocked** until the live site's sign-in is restored and the source is inspected |
@@ -74,10 +75,10 @@ Then retest the loan list, detail, schedule, repayment and dashboard fixture agr
 
 These need the live modules' real fields, rules and permissions first (handoff "Remaining live audit checklist"). Until then they stay placeholders that say so. Building them from guesses would fabricate behaviour the handoff explicitly forbids.
 
-### Phase 2 leftovers. **Next**
+### Phase 2 leftovers. **Done**
 
-~~B2-05 Repayments index~~ (done), ~~B2-06 Collections~~ (done), B2-07 Collateral, B2-08 Groups.
+~~B2-05 Repayments index~~, ~~B2-06 Collections~~, ~~B2-07 Collateral~~, ~~B2-08 Groups~~, then R7 (done).
 
-### R7: Final release-readiness report. **Last**
+### R7: Final release-readiness report. **Done**
 
-Reconcile F01–F75 against the branch at 390, 768, 1024 and 1440 px, with a Pass/Fail/Blocked matrix.
+Reconcile F01–F75 against the branch at 390, 768, 1024 and 1440 px, with a Pass/Fail/Blocked matrix. See `RELEASE-READINESS.md`. Next: restore the development site's sign-in so R4–R6 can be inspected.

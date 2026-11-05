@@ -10,7 +10,7 @@ import { plannedIncrement } from "@/lib/roadmap"
 type Props = { params: Promise<{ slug: string[] }> }
 
 /** Destinations with their own page. The placeholder never claims these. */
-const BUILT = new Set(["/dashboard", "/activities", "/loans", "/clients", "/transactions", "/repayments", "/collections", "/collateral", "/credit-score", "/calendar", "/workspace/approvals", "/workspace/notifications"])
+const BUILT = new Set(["/dashboard", "/activities", "/loans", "/clients", "/transactions", "/repayments", "/collections", "/collateral", "/groups", "/credit-score", "/calendar", "/workspace/approvals", "/workspace/notifications"])
 
 export function generateStaticParams() {
   return allDestinations()

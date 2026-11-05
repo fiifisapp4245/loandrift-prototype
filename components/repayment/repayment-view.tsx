@@ -169,7 +169,7 @@ export function RepaymentView({ reference }: { reference: string }) {
         {schedule.length === 0 ? (
           <p className="text-sm text-muted-foreground">{isUnavailable(position.totalPayable) ? position.totalPayable.reason : "No schedule."}</p>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border">
+          <div tabIndex={0} role="region" aria-label={`Repayment schedule for ${reference}, scrolls sideways`} className="overflow-x-auto rounded-2xl border">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Repayment schedule for {reference}</caption>
               <thead className="bg-muted/60 text-xs text-muted-foreground">
@@ -206,7 +206,7 @@ export function RepaymentView({ reference }: { reference: string }) {
         {receipts.length === 0 ? (
           <p className="text-sm text-muted-foreground">No payments recorded.</p>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border">
+          <div tabIndex={0} role="region" aria-label={`Receipts for ${reference}, scrolls sideways`} className="overflow-x-auto rounded-2xl border">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">Receipts for {reference}, newest first</caption>
               <thead className="bg-muted/60 text-xs text-muted-foreground">

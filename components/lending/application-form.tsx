@@ -25,6 +25,7 @@ import {
   currencyFor,
   requirements,
   sectionState,
+  unitsDiffer,
   validateOptional,
   validatePenalty,
   validateTerms,
@@ -217,7 +218,7 @@ export function ApplicationForm({ initialClientId }: { initialClientId?: string 
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[17rem_1fr]">
         <nav aria-label="Application sections" className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-          <ol className="flex gap-1 overflow-x-auto rounded-3xl border bg-card p-2 lg:flex-col lg:overflow-visible">
+          <ol className="relative flex gap-1 overflow-x-auto rounded-3xl border bg-card p-2 lg:flex-col lg:overflow-visible">
             {SECTIONS.map((s, i) => {
               const state = sectionState(s.id, draft)
               const locked = state === "locked"
@@ -584,10 +585,6 @@ function withClient(d: ApplicationDraft, clientId: string): ApplicationDraft {
     businesses: c.business ? [{ name: c.business.name, type: c.business.type, years: "" }] : [],
     monthlyIncome: c.monthlyIncome ? String(c.monthlyIncome.minor / 100) : "",
   }
-}
-
-function unitsDiffer(period: string, frequency: string) {
-  return !((period === "Week" && frequency === "Weekly") || (period === "Month" && frequency === "Monthly"))
 }
 
 function Checklist({ reqs, onGo }: { reqs: ReturnType<typeof requirements>; onGo?: (id: SectionId) => void }) {

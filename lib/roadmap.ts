@@ -6,7 +6,6 @@
 export type Planned = { increment: string; blocked?: string }
 
 const plannedIn: [prefix: string, Planned][] = [
-  ["/groups", { increment: "B2-08 (Groups)" }],
   ["/savings", { increment: "R4 (Savings and Investments)", blocked: "Only the live listing has been seen; its fields and rules need inspecting first." }],
   ["/investments", { increment: "R4 (Savings and Investments)", blocked: "The live module hasn't been inspected yet." }],
   ["/expenses", { increment: "R5 (Expenses and Accounting)", blocked: "The live module hasn't been inspected yet." }],

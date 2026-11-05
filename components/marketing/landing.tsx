@@ -250,7 +250,7 @@ export function LoanDriftLanding({ release }: { release: boolean }) {
       </Section>
 
       <Section id="compare" eyebrow="Compare" title="What each plan includes" className="bg-background">
-        <div className="overflow-x-auto rounded-3xl border bg-card">
+        <div tabIndex={0} role="region" aria-label="Plan comparison, scrolls sideways" className="overflow-x-auto rounded-3xl border bg-card">
           <table className="w-full min-w-[36rem] text-left">
             <caption className="sr-only">LoanDrift plan comparison</caption>
             <thead className="border-b text-sm">

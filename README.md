@@ -31,9 +31,11 @@ Then open <http://localhost:3000> (or run `npm run dev -- --port 3217` and open 
 | Prompt 6: Financial contract and repayment workflow | **Done.** See [CHANGES.md](CHANGES.md) and [FINANCIAL-CONTRACT.md](FINANCIAL-CONTRACT.md) |
 | Prompt 7: LoanDrift product page and demo handoff | **Done.** See [CHANGES.md](CHANGES.md) |
 | Phase 2 B2-03 + B2-04: Loan Features merged into All Loans; Transactions | **Done.** See [CHANGES.md](CHANGES.md) |
+| Phase 2 B2-05 to B2-08: Repayments, Collections, Collateral, Groups | **Done.** See [CHANGES.md](CHANGES.md) |
+| R7: release-readiness report | **Done.** See [RELEASE-READINESS.md](RELEASE-READINESS.md): scope, checks at four widths, the F01–F75 matrix and what's still open |
 | Prompt 8: final verification | **Done.** See [VERIFICATION.md](VERIFICATION.md): checks, axe results, flow evidence and the F01–F68 status matrix |
 
-Screens not built yet (the Repayments index, Collections, Collateral, Groups) resolve to a page that names the prompt that will build them.
+Every Phase 2 screen is now built (B2-05 to B2-08). Screens still to come (Savings, Investments, Expenses, Accounting, Reports, Bulk Upload) resolve to a page that names the prompt that will build them and says it's on hold until the live module is inspected.
 
 ### Dashboard demo states
 
@@ -72,6 +74,15 @@ Add `?demo=` to `/dashboard` to see the states the dashboard handles:
 | `/collections?age=31-60` | Empty age band named precisely; branch totals unchanged; Reset |
 | `/collections?account=DEMO-LN-002` | Contact history with kept, broken and open promises worked out from receipts |
 | `/collections?account=DEMO-LN-001` | No prior contact; log one (saved in memory only) |
+| `/collateral?exception=no_lien` | Missing-lien exception as its own queue (rule flagged as policy to confirm) |
+| `/collateral?asset=DEMO-COL-03` | Written-off loan: removal refused with a reason, recovery offered; third-party owner; independent valuation |
+| `/collateral/new` | Register an asset: type-specific and third-party fields, no evidence-like defaults |
+| `/groups?q=zzz` | Search with no match: "No group matches", branch totals unchanged |
+| `/groups/DEMO-GR-02` | Missing meeting place and notes shown as Not recorded; Add member, role change and removal reviewed, never saved; no group loans yet |
+| `/groups/DEMO-GR-02?demo=member-error` | A member change that fails to check: "Nothing was changed; try again" |
+| `/groups/DEMO-GR-01` | An existing group loan: each member's principal, the total, liability and terms |
+| `/groups/DEMO-GR-02/apply` | Group loan application: nobody included, no liability chosen, Apply disabled at zero; one member can't be included (no phone) |
+| `/groups/new` | Form a group: meeting fields optional and shown as Not recorded if blank |
 | `/expenses` | Placeholder that says it's on hold until the live module is inspected |
 | `/products/loandrift` | Product page, draft view with owner-review tags |
 | `/products/loandrift?mode=release` | Release preview: everything under review hidden |
@@ -93,6 +104,8 @@ app/(app)/clients/            Clients, client profile, Add client form (Prompt 5
 app/(app)/transactions/       Branch ledger with transaction drawer (B2-04)
 app/(app)/repayments/         Receipts: received today, payment history, receipt preview (B2-05)
 app/(app)/collections/        Arrears worklist and follow-up drawer with contact logging (B2-06)
+app/(app)/collateral/         Collateral register, asset drawer and Register an asset (B2-07)
+app/(app)/groups/             Groups list, group page, group loan application, Form a group (B2-08)
 app/(app)/credit-score/       Assessment history with drawer (R3)
 app/(app)/calendar/           Month and week calendar: scheduled vs received (R3)
 app/(marketing)/              Public pages: /products/loandrift and /contact (Prompt 7)
@@ -123,6 +136,10 @@ lib/api/credit.ts             Latest vs history, filters, per-model counts; neve
 lib/api/calendar.ts           Scheduled installments vs receipts per day, from the canonical schedule
 lib/api/repayments.ts         Receipts from the ledger, per-currency totals, no balance-snapshot sums
 lib/api/collections.ts        Arrears from the contract; channel, outcome and promise rules; promise status from receipts
+lib/collateral-fixtures.ts    FICTIONAL assets, owners, valuations and liens (the one collateral source)
+lib/api/collateral.ts         Value basis, exceptions, lifecycle actions, form checks
+lib/group-fixtures.ts         FICTIONAL groups, memberships and one group loan
+lib/api/groups.ts             Branch totals, one-active-group rule, member checks, group loan checks reusing the application's terms
 lib/roadmap.ts                Which prompt builds each placeholder, and which are on hold
 lib/legacy-routes.ts          Old Loan Features paths and their All Loans redirects
 lib/marketing-content.ts      Product page content with review status; one plan entitlement dataset
